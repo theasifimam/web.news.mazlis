@@ -1,26 +1,124 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-background: var(--site-bg);
+  --color-foreground: var(--site-fg);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --site-bg: #fcfcfc;
+  --site-fg: #18181b;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --site-bg: #0a0a0a;
+  --site-fg: #ededed;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--site-bg);
+  color: var(--site-fg);
+  font-family: var(--font-inter);
 }
+
+.font-outfit {
+  font-family: var(--font-outfit);
+}
+
+::selection {
+  background: #18181b;
+  color: #ffffff;
+}
+
+.ql-editor {
+  line-height: 1.5 !important;
+  color: var(--site-fg) !important;
+}
+
+/* Force visibility by overriding fixed inline styles from pastes */
+.ql-editor :not(a) {
+  background-color: transparent !important;
+  color: var(--site-fg) !important;
+}
+
+/* Maintain distinct link colors */
+.ql-editor a {
+  color: #3b82f6 !important;
+  text-decoration: underline;
+}
+
+
+.ql-align-center {
+  text-align: center;
+}
+
+.ql-align-right {
+  text-align: right;
+}
+
+.ql-align-justify {
+  text-align: justify;
+}
+
+.ql-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 1.5rem;
+  margin: 2rem 0;
+}
+
+/* Prose refinements for Quill output */
+.prose .ql-video {
+  margin: 3rem 0;
+}
+
+.prose blockquote {
+  font-style: italic;
+  border-left-width: 4px;
+  padding-left: 2rem;
+}
+
+/* ─── List Styles for Quill ─── */
+.ql-editor ul, .ql-editor ol {
+  padding-left: 1.5em !important;
+  margin-bottom: 1.5rem !important;
+  list-style-position: outside !important;
+}
+
+.ql-editor ul {
+  list-style-type: disc !important;
+}
+
+.ql-editor ol {
+  list-style-type: decimal !important;
+}
+
+.ql-editor li {
+  margin-bottom: 0.75rem !important;
+  display: list-item !important;
+  padding-left: 0.5em !important;
+}
+
+/* Nested Lists */
+.ql-editor li > ul, .ql-editor li > ol {
+  margin-top: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.ql-editor ul ul { list-style-type: circle !important; }
+.ql-editor ul ul ul { list-style-type: square !important; }
+
+/* Indent support */
+.ql-indent-1 { padding-left: 3em !important; }
+.ql-indent-2 { padding-left: 4.5em !important; }
+.ql-indent-3 { padding-left: 6em !important; }
+.ql-indent-4 { padding-left: 7.5em !important; }
+.ql-indent-5 { padding-left: 9em !important; }
+.ql-indent-6 { padding-left: 10.5em !important; }
+.ql-indent-7 { padding-left: 12em !important; }
+.ql-indent-8 { padding-left: 13.5em !important; }
+
+
+
