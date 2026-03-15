@@ -8,19 +8,40 @@
 }
 
 :root {
-  --site-bg: #fcfcfc;
-  --site-fg: #18181b;
+  --site-bg: #f8f9fa;
+  --site-fg: #000000;
+  --accent: #000000;
+  --card-bg: #ffffff;
+  --radius-xl: 2.5rem;
+  --radius-lg: 1.5rem;
+  --font-outfit: "Outfit", sans-serif;
+  --font-inter: "Inter", sans-serif;
 }
 
 .dark {
-  --site-bg: #0a0a0a;
-  --site-fg: #ededed;
+  --site-bg: #000000;
+  --site-fg: #ffffff;
+  --accent: #ffffff;
+  --card-bg: #111111;
 }
 
 body {
   background-color: var(--site-bg);
   color: var(--site-fg);
   font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hide scrollbar on mobile devices for a cleaner app-like feel */
+@media (max-width: 768px) {
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  *::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .font-outfit {
@@ -118,7 +139,63 @@ body {
 .ql-indent-5 { padding-left: 9em !important; }
 .ql-indent-6 { padding-left: 10.5em !important; }
 .ql-indent-7 { padding-left: 12em !important; }
-.ql-indent-8 { padding-left: 13.5em !important; }
+.ql-indent-8 { padding-left: 13.5em !important; }/* ─── Code Snippets for Quill (Syntax Highlighted) ─── */
+pre.ql-syntax {
+  background-color: #1a1b26 !important; /* Premium deep blue-black */
+  color: #a9b1d6 !important;
+  border-radius: 1.5rem !important;
+  padding: 2.5rem 2rem 2rem !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace !important;
+  font-size: 0.95rem !important;
+  line-height: 1.7 !important;
+  margin: 3rem 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  white-space: pre !important;
+  overflow-x: auto;
+  position: relative;
+  tab-size: 2;
+}
 
+/* Stylish "Code" indicator label */
+pre.ql-syntax::before {
+  content: 'SIGNAL CODE';
+  position: absolute;
+  top: 0.75rem;
+  left: 2rem;
+  font-family: var(--font-outfit);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  pointer-events: none;
+}
 
+/* Scrollbar styling for code blocks */
+pre.ql-syntax::-webkit-scrollbar {
+  height: 8px;
+}
 
+pre.ql-syntax::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+pre.ql-syntax::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+pre.ql-syntax::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark pre.ql-syntax {
+  background-color: #0b0e14 !important; /* Extremely dark for dark mode depth */
+  border-color: rgba(255,255,255,0.03) !important;
+}
+
+.ql-editor .ql-syntax :not(a) {
+  background-color: transparent !important;
+  color: inherit !important;
+}

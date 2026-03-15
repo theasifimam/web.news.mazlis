@@ -3,139 +3,191 @@
 import React, { use } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { useGetArticleByIdQuery, useGetArticlesQuery } from '@/lib/api/articlesApi';
-import { formatDistanceToNow } from 'date-fns';
-import { Loader2, FileText, ArrowRight, Clock, Eye } from 'lucide-react';
+import { MOCK_ARTICLES } from '@/lib/mock-data';
+import { Clock, Eye } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useGetArticleByIdQuery, useGetArticlesQuery } from '@/lib/api/articlesApi';
+import { format } from 'date-fns';
+import { getImageUrl } from '@/lib/config';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-dark.css';
 
 export default function ArticlePage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
     const params = use(paramsPromise);
     const id = params.id;
 
-    const { data: response, isLoading } = useGetArticleByIdQuery(id);
-    const { data: recentResponse } = useGetArticlesQuery({ limit: 4 });
+    const { data: response, isLoading, error } = useGetArticleByIdQuery(id);
+    const { data: moreArticles } = useGetArticlesQuery({ limit: 4 });
+    const article = response?.data;
 
-    const article = response?.success ? response.data : null;
-    const recentArticles = recentResponse?.success ? recentResponse.data : [];
+    // Apply highlighting for code snippets
+    React.useEffect(() => {
+        if (article?.content) {
+            // Target all Quill syntax blocks specifically
+            const codeBlocks = document.querySelectorAll('pre.ql-syntax');
+            codeBlocks.forEach((block) => {
+                hljs.highlightElement(block as HTMLElement);
+            });
+        }
+    }, [article, isLoading]);
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[#fcfcfc] dark:bg-[#0a0a0a]">
-                <Loader2 className="animate-spin text-zinc-300" size={40} />
-                <span className="text-[11px] font-black uppercase tracking-[0.6em] text-zinc-500 animate-pulse">Syncing Archive...</span>
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-zinc-400" size={40} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">Retrieving intelligence...</span>
+                </div>
             </div>
         );
     }
 
-    if (!article) {
+    if (!article || error) {
         return (
-            <div className="min-h-screen flex flex-col bg-[#fcfcfc] dark:bg-[#0a0a0a]">
-                <Header />
-                <main className="flex-1 flex flex-col items-center justify-center p-20 gap-6 text-center">
-                    <FileText size={48} className="text-zinc-200 dark:text-zinc-800" />
-                    <h1 className="text-2xl font-black font-outfit uppercase tracking-tighter">Signal Log Not Found</h1>
-                    <p className="text-zinc-500 max-w-md">The requested dispatch does not exist in our archives or has been decommissioned.</p>
-                    <Link href="/" className="px-8 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full text-[10px] font-black uppercase tracking-widest">Return to Matrix</Link>
-                </main>
-                <Footer />
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-6">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold font-outfit mb-2">Signal Lost</h2>
+                    <p className="text-zinc-500">We couldn't locate the requested article.</p>
+                </div>
+                <Link href="/" className="px-6 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full text-xs font-bold uppercase tracking-widest">
+                    Return to Feed
+                </Link>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-300 overflow-x-hidden pb-12">
+        <div className="min-h-screen bg-background text-foreground font-sans transition-colors duration-300 pb-24">
             <Header />
 
             <main className="flex flex-col items-center w-full">
-                <section className="relative w-full h-[70vh] md:h-[85vh] overflow-hidden">
-                    <img
-                        src={`http://localhost:5000${article.image}`}
+                {/* Hero Section - Rectangular Bottom */}
+                <section className="relative w-full h-[70vh] md:h-[80vh] overflow-hidden">
+                    <Image
+                        src={getImageUrl(article.image)}
                         alt={article.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        priority
+                        unoptimized={true}
                     />
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    {/* Gradients for readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                    <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
 
-                    {/* Back Button */}
-                    <Link href="/" className="absolute top-8 left-8 p-3 bg-white/10 backdrop-blur-xl border-white/20 rounded-full text-white active:scale-90 transition-all">
-                        <ArrowRight className="rotate-180" size={24} />
-                    </Link>
+                    {/* Overlaid Content (Title, Category, Excerpt) */}
+                    <div className="absolute bottom-24 left-6 right-6 md:left-12 md:right-12 flex flex-col gap-4 max-w-3xl">
+                        <div className="w-fit px-4 py-1.5 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full">
+                            <span className="text-[11px] font-bold text-white uppercase tracking-widest">
+                                {article.topic?.[0]?.name || 'Uncategorized'}
+                            </span>
+                        </div>
 
-                    {/* Overlaid Content */}
-                    <div className="absolute bottom-24 left-8 right-8 flex flex-col gap-4 max-w-2xl">
-                        <span className="w-fit bg-emerald-500/20 backdrop-blur-xl text-emerald-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full border border-emerald-500/30">
-                            {article.topic[0]?.name || 'GENERAL'}
-                        </span>
-                        <h1 className="text-3xl md:text-6xl font-black font-outfit tracking-tighter text-white leading-[1] uppercase">
+                        <h1 className="text-3xl md:text-6xl font-bold font-outfit tracking-tight text-white leading-[1.1]">
                             {article.title}
                         </h1>
-                        <p className="text-white/60 text-sm md:text-lg font-medium leading-relaxed max-w-lg">
-                            An in-depth analysis of the current infrastructure and policy shifts defining our collective future.
-                        </p>
                     </div>
                 </section>
 
-                {/* Floating Meta Card */}
-                <section className="relative z-10 -mt-16 w-full px-6 flex justify-center">
-                    <div className="w-full max-w-3xl bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 shadow-2xl shadow-black/10 rounded-[2.5rem] p-6 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                                <img
-                                    src={article.author?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(article.author?.fullName || 'A')}&background=f4f4f5&color=18181b`}
-                                    alt={article.author?.fullName}
-                                    className="w-full h-full object-cover"
+                {/* Content Container with Top Radius */}
+                <div className="relative w-full bg-background rounded-t-[3rem] md:rounded-t-[4rem] -mt-12 z-30 pt-10 flex flex-col items-center">
+                    {/* Metadata Row - Single Line */}
+                    <div className="w-full max-w-4xl px-6 flex flex-row items-center gap-2 overflow-x-auto no-scrollbar pb-8 mb-4">
+                        {/* Author Pill */}
+                        <div className="flex items-center gap-2 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-900 pl-1 pr-4 py-1.5 rounded-full shrink-0 h-10">
+                            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-zinc-800">
+                                <Image
+                                    src={article.author.avatar
+                                        ? getImageUrl(article.author.avatar)
+                                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(article.author.fullName)}&background=18181b&color=ffffff`}
+                                    alt={article.author.fullName}
+                                    width={32}
+                                    height={32}
+                                    className="object-cover"
+                                    unoptimized={true}
                                 />
                             </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-black tracking-tight">{article.author?.fullName || 'Anonymous'}</span>
-                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Author</span>
+                            <span className="text-xs font-bold whitespace-nowrap">{article.author.fullName}</span>
+                        </div>
+
+                        {/* Date (Time) Pill */}
+                        <div className="flex items-center gap-2 px-5 py-2.5 bg-zinc-100/50 dark:bg-zinc-800/50 rounded-full shrink-0 h-10">
+                            <Clock size={14} className="text-zinc-400 shrink-0" />
+                            <span className="text-xs font-bold whitespace-nowrap text-zinc-600 dark:text-zinc-300">
+                                {format(new Date(article.createdAt), 'MMM d, yyyy')}
+                            </span>
+                        </div>
+
+                        {/* Views Pill */}
+                        <div className="flex items-center gap-2 px-5 py-2.5 bg-zinc-100/50 dark:bg-zinc-800/50 rounded-full shrink-0 h-10">
+                            <Eye size={14} className="text-zinc-400 shrink-0" />
+                            <span className="text-xs font-bold whitespace-nowrap text-zinc-600 dark:text-zinc-300">
+                                {article.readCount?.toLocaleString() || 0}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Article content body */}
+                    <article className="w-full max-w-4xl px-6 flex flex-col gap-10">
+                        {/* fix overflow of text in x direction, break words to second line */}
+                        <div
+                            className="max-w-full text-zinc-800 dark:text-zinc-200 text-lg leading-relaxed text-justify overflow-x-hidden break-words"
+                            dangerouslySetInnerHTML={{ __html: article.content }}
+                        />
+
+                        {/* Image Gallery */}
+                        <div className="grid grid-cols-2 gap-4 h-[250px] md:h-[400px]">
+                            <div className="relative h-full rounded-[2rem] overflow-hidden">
+                                <Image
+                                    src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80"
+                                    alt="Gallery image 1"
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+                            <div className="relative h-full rounded-[2rem] overflow-hidden">
+                                <Image
+                                    src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80"
+                                    alt="Gallery image 2"
+                                    fill
+                                    className="object-cover"
+                                />
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-2">
-                                <Clock size={16} className="text-zinc-300" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">{formatDistanceToNow(new Date(article.createdAt))}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Eye size={16} className="text-zinc-300" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">{article.readCount || 0}</span>
-                            </div>
+                        <div className="prose prose-zinc dark:prose-invert max-w-none">
+                            <p className="text-zinc-800 dark:text-zinc-200 text-lg leading-relaxed">
+                                The transition from bulky DSLRs to compact, powerful mirrorless bodies has mirrored the shift from traditional media conglomerates to independent, agile intelligence agencies like Mazlis. Our commitment to high-fidelity reporting is matched only by our dedication to the tools that make it possible.
+                            </p>
                         </div>
+                    </article>
+                </div>
+
+                {/* Related Articles Footer */}
+                <section className="w-full max-w-[1400px] mt-24 px-6">
+                    <div className="flex items-center justify-between mb-12">
+                        <h2 className="text-2xl font-bold font-outfit">More from Mazlis</h2>
+                        <Link href="/" className="text-xs font-bold uppercase tracking-widest text-zinc-400">View All</Link>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {moreArticles?.data?.slice(0, 4).map(a => (
+                            <Link key={a._id} href={`/articles/${a._id}`} className="group flex flex-col gap-4">
+                                <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                                    <Image
+                                        src={getImageUrl(a.image)}
+                                        alt={a.title}
+                                        fill
+                                        className="object-cover transition-transform group-hover:scale-105"
+                                        unoptimized={true}
+                                    />
+                                </div>
+                                <h3 className="text-md font-bold font-outfit leading-tight group-hover:text-zinc-500 transition-colors line-clamp-2">{a.title}</h3>
+                            </Link>
+                        ))}
                     </div>
                 </section>
-
-                {/* Article content body */}
-                <article className="w-full max-w-3xl px-8 mt-16 md:mt-24">
-                     <div
-                        className="prose prose-zinc dark:prose-invert max-w-none break-words overflow-hidden w-full ql-editor
-                        prose-p:text-lg prose-p:md:text-xl prose-p:font-light prose-p:text-zinc-800 dark:prose-p:text-zinc-300 prose-p:leading-relaxed
-                        prose-h1:text-3xl prose-h1:font-black prose-h1:font-outfit prose-h1:tracking-tighter prose-h1:uppercase
-                        prose-h2:text-2xl prose-h2:font-black prose-h2:font-outfit prose-h2:tracking-tighter prose-h2:text-zinc-900 dark:prose-h2:text-white prose-h2:mt-12 prose-h2:uppercase"
-                        dangerouslySetInnerHTML={{ __html: article.content }}
-                    />
-
-                    {/* Footer tags and share */}
-                    <div className="mt-24 pt-12 border-t border-zinc-100 dark:border-zinc-900 flex flex-col gap-12">
-                        <div className="flex flex-wrap gap-2">
-                            {article.topic.map(t => (
-                                <span key={t._id} className="text-[9px] font-bold uppercase tracking-widest bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 px-4 py-2 rounded-full">
-                                    {t.name}
-                                </span>
-                            ))}
-                        </div>
-                        
-                        <div className="flex items-center justify-between py-6">
-                           <Link href="/" className="text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                                Return to Archive
-                           </Link>
-                           <div className="flex gap-6">
-                               <button className="text-xs font-black uppercase tracking-widest text-zinc-400">Share</button>
-                               <button className="text-xs font-black uppercase tracking-widest text-zinc-400">Save</button>
-                           </div>
-                        </div>
-                    </div>
-                </article>
             </main>
 
             <Footer />

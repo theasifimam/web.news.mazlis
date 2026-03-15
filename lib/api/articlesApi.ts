@@ -24,7 +24,7 @@ export const articlesApi = createApi({
     baseQuery: axiosBaseQuery(),
     tagTypes: ["Articles"],
     endpoints: (builder) => ({
-        getArticles: builder.query<{ success: boolean; data: Article[] }, { topic?: string; author?: string; page?: number; limit?: number }>({
+        getArticles: builder.query<{ success: boolean; data: Article[] }, { topic?: string; author?: string; page?: number; limit?: number; status?: 'published' | 'draft' }>({
             query: (params) => ({
                 url: "/articles",
                 method: "GET",

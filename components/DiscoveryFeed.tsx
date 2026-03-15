@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ChevronRight, Loader2, FileText } from 'lucide-react';
 import { useGetArticlesQuery, Article } from '@/lib/api/articlesApi';
 import Link from 'next/link';
+import { getImageUrl } from '@/lib/config';
 
 
 export default function DiscoveryFeed() {
@@ -57,7 +58,7 @@ export default function DiscoveryFeed() {
         <div className="relative h-[65vh] w-full overflow-hidden rounded-[3.5rem] shadow-2xl shadow-black/5">Could the US deploy troops to Iran, and how could that play out?News of the day
           Could the US deploy troops to Iran, and how could th
           <img
-            src={`http://localhost:5000${featured.image}`}
+            src={getImageUrl(featured.image)}
             className="w-full h-full object-cover"
             alt={featured.title}
           />

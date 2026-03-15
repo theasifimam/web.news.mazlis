@@ -1,122 +1,95 @@
-import React from 'react';
-import Link from 'next/link';
+"use client";
+
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ArticleCard from '@/components/ArticleCard';
+import { useGetArticlesQuery } from '@/lib/api/articlesApi';
+import { Loader2 } from 'lucide-react';
+import { format } from 'date-fns';
+import Image from 'next/image';
 
 export default function ArticlesPage() {
-    const articles = [
-        {
-            id: 'the-quiet-technical-revolution',
-            tag: 'INVESTIGATION',
-            title: 'The Architecture of Entropy.',
-            desc: 'Exploring the decaying digital infrastructures that still power the modern financial core.',
-            img: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=2070&auto=format&fit=crop',
-            author: 'Marcus Thorne',
-            date: 'Mar 05, 2026'
-        },
-        {
-            id: '02',
-            tag: 'POLITICS',
-            title: 'The geography of legislative power.',
-            desc: 'An exploration of how physical infrastructure dictates political leverage in the 21st century.',
-            img: 'https://images.unsplash.com/photo-1541872703-74c5e443d1fe?q=80&w=2038&auto=format&fit=crop',
-            author: 'Elara Vance',
-            date: 'Feb 28, 2026'
-        },
-        {
-            id: '03',
-            tag: 'ECONOMICS',
-            title: 'Scarcity as a deliberate design choice.',
-            desc: 'How modern luxury brands and digital assets are redefining value through engineered friction.',
-            img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop',
-            author: 'Marcus Thorne',
-            date: 'Feb 15, 2026'
-        },
-        {
-            id: '04',
-            tag: 'SCIENCE',
-            title: 'The biological limits of computation.',
-            desc: 'New research suggests we may be approaching the hard thermodynamic edge of silicon processing.',
-            img: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2090&auto=format&fit=crop',
-            author: 'Dr. Aris Voss',
-            date: 'Jan 22, 2026'
-        }
-    ];
+    const { data: response, isLoading } = useGetArticlesQuery({});
+    const articles = response?.data || [];
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-zinc-400" size={40} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">Synchronizing Signals...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#fcfcfc] dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-900 dark:selection:bg-zinc-100 selection:text-white dark:selection:text-zinc-900 transition-colors duration-300">
+        <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
             <Header />
 
-            <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 md:px-12 py-12 md:py-24">
-                <div className="flex flex-col gap-16">
-                    {/* Page Header */}
-                    <div className="flex flex-col gap-6 max-w-2xl">
-                        <h1 className="text-5xl md:text-8xl font-black font-outfit tracking-tighter text-zinc-900 dark:text-white leading-none uppercase">
-                            The Archive.
-                        </h1>
-                        <p className="text-zinc-500 dark:text-zinc-400 text-lg md:text-xl leading-relaxed font-light italic">
-                            "A complete log of investigations into the architectures, protocols, and policies defining our reality."
-                        </p>
+            <main className="flex-1 w-full flex flex-col">
+                {/* Hero Section */}
+                <section className="relative w-full h-[60vh] md:h-[55vh] overflow-hidden bg-zinc-900">
+                    <Image
+                        src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=2000"
+                        alt="Archive Background"
+                        fill
+                        className="object-cover opacity-60 grayscale"
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                    <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+
+                    <div className="absolute bottom-24 left-6 right-6 md:left-12 md:right-12 z-20 max-w-4xl">
+                        <div className="flex flex-col gap-4">
+                            <h1 className="text-[44px] md:text-8xl font-bold font-outfit tracking-tighter text-white leading-none uppercase">
+                                The Archive.
+                            </h1>
+                            <p className="text-[12px] md:text-sm font-bold text-white/60 uppercase tracking-[0.2em] max-w-xl">
+                                "A complete log of investigations into the architectures, protocols, and policies defining our reality."
+                            </p>
+                        </div>
                     </div>
+                </section>
 
-                    <div className="w-full h-[1px] bg-zinc-200 dark:bg-zinc-800"></div>
+                {/* Content Island */}
+                <div className="relative w-full bg-background rounded-t-[2.5rem] md:rounded-t-[4rem] -mt-12 z-30 pt-20 flex flex-col items-center">
+                    <div className="w-full max-w-[1400px] px-6 lg:px-12 flex flex-col gap-16">
 
-                    {/* Articles List */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
-                        {articles.map((article, idx) => (
-                            <article key={article.id} className="group flex flex-col gap-8">
-                                <Link href={`/articles/${article.id}`} className="block relative aspect-[16/10] overflow-hidden bg-zinc-100 dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-900 shadow-xl shadow-zinc-200/50 dark:shadow-black/20">
-                                    <img
-                                        src={article.img}
-                                        alt={article.title}
-                                        className="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 ease-out"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                </Link>
+                        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 pb-8">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Total Recorded Signals ({articles.length})</h2>
+                            <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-300 dark:text-zinc-700">
+                                Filter: Chronological
+                            </div>
+                        </div>
 
-                                <div className="flex flex-col gap-6">
-                                    <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 pb-4">
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-500">{article.tag}</span>
-                                        </div>
-                                        <span className="text-[10px] font-black italic tracking-widest text-zinc-300 dark:text-zinc-700">SIGNAL 0{idx + 1}</span>
-                                    </div>
+                        {/* Articles Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+                            {articles.map((article) => (
+                                <ArticleCard
+                                    key={article._id}
+                                    article={{
+                                        id: article._id,
+                                        title: article.title,
+                                        author: article.author?.fullName || 'Anonymous',
+                                        date: format(new Date(article.createdAt), 'MMM dd, yyyy'),
+                                        imageUrl: article.image,
+                                        views: article.readCount
+                                    }}
+                                    variant="vertical"
+                                />
+                            ))}
+                        </div>
 
-                                    <div className="flex flex-col gap-4">
-                                        <Link href={`/articles/${article.id}`}>
-                                            <h2 className="text-3xl md:text-4xl font-black font-outfit tracking-tighter text-zinc-900 dark:text-white leading-tight group-hover:text-zinc-500 transition-colors uppercase">
-                                                {article.title}
-                                            </h2>
-                                        </Link>
-                                        <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed font-light line-clamp-2 italic">
-                                            "{article.desc}"
-                                        </p>
-                                    </div>
-
-                                    <div className="flex items-center gap-6 pt-2">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-zinc-400">Architect</span>
-                                            <span className="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">{article.author}</span>
-                                        </div>
-                                        <div className="w-[1px] h-6 bg-zinc-100 dark:bg-zinc-900"></div>
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-zinc-400">Dispatch Date</span>
-                                            <span className="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">{article.date}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
-
-                    {/* Pagination Placeholder */}
-                    <div className="flex items-center justify-center pt-20">
-                        <button className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-4 group">
-                            <span className="w-12 h-[1px] bg-zinc-100 dark:bg-zinc-900 group-hover:w-20 transition-all"></span>
-                            Load More Signals
-                            <span className="w-12 h-[1px] bg-zinc-100 dark:bg-zinc-900 group-hover:w-20 transition-all"></span>
-                        </button>
+                        {/* Pagination Placeholder */}
+                        <div className="flex items-center justify-center pt-20 pb-32">
+                            <button className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-4 group">
+                                <span className="w-12 h-[1px] bg-zinc-100 dark:bg-zinc-900 group-hover:w-20 transition-all"></span>
+                                Load More Signals
+                                <span className="w-12 h-[1px] bg-zinc-100 dark:bg-zinc-900 group-hover:w-20 transition-all"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </main>

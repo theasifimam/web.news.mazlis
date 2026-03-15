@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Clock, Loader2, FileText } from 'lucide-react';
 import { useGetArticlesQuery, Article } from '@/lib/api/articlesApi';
 import { formatDistanceToNow } from 'date-fns';
+import { getImageUrl } from '@/lib/config';
 
 export default function LatestArticles() {
     const { data: response, isLoading } = useGetArticlesQuery({ limit: 4 });
@@ -79,7 +80,7 @@ export default function LatestArticles() {
                     <div className="lg:col-span-5 order-1 lg:order-2">
                         <Link href={`/articles/${leadArticle._id}`} className="block relative group overflow-hidden bg-zinc-100 dark:bg-zinc-900 aspect-[4/5] md:aspect-[3/4] rounded-2xl md:rounded-4xl">
                             <img
-                                src={`http://localhost:5000${leadArticle.image}`}
+                                src={getImageUrl(leadArticle.image)}
                                 alt={leadArticle.title}
                                 className="w-full h-full object-cover grayscale opacity-90 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-1000 ease-out"
                             />
@@ -106,7 +107,7 @@ export default function LatestArticles() {
                             <article key={item._id} className="group flex flex-col gap-3">
                                 <Link href={`/articles/${item._id}`} className="block relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-900 rounded-3xl mb-1 shadow-sm">
                                     <img
-                                        src={`http://localhost:5000${item.image}`}
+                                        src={getImageUrl(item.image)}
                                         alt={item.title}
                                         className="w-full h-full object-cover grayscale opacity-80 group-hover:scale-110 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 ease-out"
                                     />

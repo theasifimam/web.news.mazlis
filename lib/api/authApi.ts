@@ -10,6 +10,16 @@ export interface User {
     status: "active" | "suspended" | "pending";
     avatar?: string;
     isVerified: boolean;
+    bio?: string;
+    location?: string;
+    mNumber?: string;
+    socials?: {
+        twitter?: string;
+        linkedin?: string;
+        website?: string;
+    };
+    bookmarks?: any[];
+    followedTopics?: any[];
     createdAt: string;
     lastLogin?: string;
 }
@@ -101,6 +111,27 @@ export const authApi = createApi({
                 data: body,
             }),
         }),
+
+        // ─── USER PROFILE ENDPOINTS ───
+        getProfile: builder.query<{ success: boolean; data: { user: User } }, void>({
+            query: () => ({
+                url: "/users/me/profile",
+                method: "GET",
+            }),
+            providesTags: ["Auth"],
+        }),
+
+        updateProfile: builder.mutation<
+            { success: boolean; message: string; data: { user: User } },
+            FormData | (Partial<User> & { mNumber?: string; bio?: string; location?: string; socials?: any; settings?: any })
+        >({
+            query: (body: any) => ({
+                url: "/users/me/update",
+                method: "PATCH",
+                data: body,
+            }),
+            invalidatesTags: ["Auth"],
+        }),
     }),
 });
 
@@ -112,4 +143,6 @@ export const {
     useGetMeQuery,
     useSignoutMutation,
     useUpdatePasswordMutation,
+    useGetProfileQuery,
+    useUpdateProfileMutation,
 } = authApi;

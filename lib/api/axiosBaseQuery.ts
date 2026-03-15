@@ -23,16 +23,21 @@ export const axiosBaseQuery =
                     ? localStorage.getItem("mazlis_token")
                     : null;
 
+            const headers: Record<string, string> = {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            };
+
+            if (!(data instanceof FormData)) {
+                headers["Content-Type"] = "application/json";
+            }
+
             const result = await axios({
                 url: (base ?? baseURL) + url,
                 method,
                 data,
                 params,
                 withCredentials: true,
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
+                headers,
             });
             return { data: result.data };
         } catch (axiosError) {

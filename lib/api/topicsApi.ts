@@ -6,6 +6,7 @@ export interface Topic {
     name: string;
     description: string;
     isParent: boolean;
+    articleCount?: number;
 }
 
 export const topicsApi = createApi({

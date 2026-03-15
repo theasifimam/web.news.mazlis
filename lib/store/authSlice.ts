@@ -52,6 +52,10 @@ const authSlice = createSlice({
             }
         },
     },
+    extraReducers: (builder) => {
+        // We can't import authApi here because of circular dependency
+        // But we can listen for fulfilled actions if we want, or just update credentials manually in components
+    },
 });
 
 export const { setCredentials, clearCredentials, hydrateAuth } = authSlice.actions;

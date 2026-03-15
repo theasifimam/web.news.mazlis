@@ -2,21 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 import { ThemeToggle } from './ThemeToggle';
 import AuthModal from './AuthModal';
-import { ArrowRight, Bell, ChevronRight, Globe, LogOut, Menu, Search, X } from 'lucide-react';
+import { ArrowRight, Bell, ChevronRight, Globe, LogOut, Menu, Search, X, ArrowLeft } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
 import { clearCredentials } from '@/lib/store/authSlice';
 import { useSignoutMutation } from '@/lib/api/authApi';
 import { toast } from 'sonner';
 import { usePathname } from 'next/navigation';
+import { getImageUrl } from '@/lib/config';
 
 export default function Header() {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [currentTime, setCurrentTime] = useState<string>("");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
     const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
 
     const dispatch = useAppDispatch();
@@ -28,6 +31,8 @@ export default function Header() {
             await signout().unwrap();
         } catch {/* ignore */ } finally {
             dispatch(clearCredentials());
+            setIsLogoutConfirmOpen(false);
+            setIsMenuOpen(false);
             toast.success('Signed out successfully.');
         }
     };
@@ -35,9 +40,7 @@ export default function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const { scrollY } = useScroll();
 
-    const headerBgOpacity = useTransform(scrollY, [0, 50], [0, 1]);
-    const headerPadding = useTransform(scrollY, [0, 50], ["1.5rem", "0.5rem"]);
-    const logoScale = useTransform(scrollY, [0, 50], [1, 0.65]);
+
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         setIsScrolled(latest > 50);
@@ -50,7 +53,7 @@ export default function Header() {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: false
+                hour12: true
             }));
         }, 1000);
 
@@ -76,42 +79,57 @@ export default function Header() {
     }, [isMenuOpen, isSearchOpen]);
 
     const navLinks = [
-        { label: "Manifesto", href: "/about" },
-        { label: "Investigations", href: "/articles" },
-        { label: "Infrastructure", href: "#" },
-        { label: "Polity", href: "#" },
-        { label: "Archive", href: "#" },
-        { label: "Contact", href: "/contact" },
+        { label: "Home", href: "/" },
+        { label: "Articles", href: "/articles" },
+        { label: "About", href: "/about" },
+        ...(isAuthenticated ? [{ label: "Profile", href: "/profile" }] : []),
+        { label: "Search", href: "/search" },
     ];
 
     const pathname = usePathname();
     const isArticlePage = pathname.includes('/articles/');
+    const isProfilePage = pathname === '/profile';
+    const isDiscoverPage = pathname === '/search';
     const isHomePage = pathname === '/';
+
+    const headerBg = isScrolled
+        ? 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-900 shadow-sm'
+        : (isHomePage || isArticlePage || isProfilePage || isDiscoverPage)
+            ? 'bg-transparent'
+            : 'bg-white dark:bg-zinc-950 border-b border-zinc-100 dark:border-zinc-900';
+
+    const contentColor = (!isScrolled && (isHomePage || isArticlePage || isProfilePage || isDiscoverPage)) ? 'text-white' : 'text-zinc-900 dark:text-zinc-100';
 
     return (
         <>
-            <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-900' : 'bg-white dark:bg-[#0a0a0a]'}`}>
-                <div className="max-w-[1400px] mx-auto px-6 md:px-12 h-16 md:h-20 flex items-center justify-between relative">
-                    {/* Left Section: Menu (Mobile) / Brand (Desktop) */}
+            <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${headerBg}`}>
+                <div className="max-w-[1400px] mx-auto px-6 md:px-12 h-14 md:h-16 flex items-center justify-between relative transition-all duration-300">
+                    {/* Left Section: Menu / Back */}
                     <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => setIsMenuOpen(true)}
-                            className="p-2 -ml-2 text-zinc-900 dark:text-zinc-100 transition-transform active:scale-90"
-                        >
-                            <Menu size={24} strokeWidth={1.5} />
-                        </button>
-
-                        {/* Minimal Desktop Brand - Only shows on larger screens to avoid overlap */}
-                        <Link href="/" className="hidden md:block font-outfit font-black text-xl tracking-tighter text-zinc-900 dark:text-white">
-                            MAZLIS<span className="text-zinc-400">.</span>
-                        </Link>
+                        {isArticlePage ? (
+                            <Link
+                                href="/"
+                                className={`p-2 -ml-2 transition-transform active:scale-90 ${contentColor}`}
+                            >
+                                <ArrowLeft size={24} strokeWidth={1.5} />
+                            </Link>
+                        ) : (
+                            <button
+                                onClick={() => setIsMenuOpen(true)}
+                                className={`p-2 -ml-2 transition-transform active:scale-90 ${contentColor}`}
+                            >
+                                <Menu size={24} strokeWidth={1.5} />
+                            </button>
+                        )}
                     </div>
 
-                    {/* Center Section: Logo (Mobile Only) */}
+                    {/* Center Section: Logo (Mobile Only) - Only visible if not homepage/article or scrolled */}
                     <div className="absolute left-1/2 -translate-x-1/2 md:hidden">
-                        <Link href="/" className="font-outfit font-black text-xl tracking-tighter text-zinc-900 dark:text-white">
-                            MAZLIS<span className="text-zinc-400">.</span>
-                        </Link>
+                        {(isScrolled || (!isHomePage && !isArticlePage)) && (
+                            <Link href="/" className="font-outfit font-black text-xl tracking-tighter text-zinc-900 dark:text-white">
+                                MAZLIS<span className="text-zinc-400">.</span>
+                            </Link>
+                        )}
                     </div>
 
                     {/* Right Section: Actions */}
@@ -119,35 +137,32 @@ export default function Header() {
                         <div className="hidden md:flex items-center gap-6">
                             {isAuthenticated && user ? (
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{user.fullName.split(' ')[0]}</span>
-                                    <button onClick={handleLogout} className="text-zinc-400 hover:text-red-500 transition-colors">
+                                    <Link href="/profile" className={`text-[10px] font-bold uppercase tracking-widest transition-colors hover:text-zinc-500 ${contentColor}`}>{user.fullName.split(' ')[0]}</Link>
+                                    <button onClick={() => setIsLogoutConfirmOpen(true)} className="text-zinc-400 hover:text-red-500 transition-colors">
                                         <LogOut size={16} />
                                     </button>
                                 </div>
                             ) : (
                                 <button
                                     onClick={() => { setAuthTab('signin'); setIsAuthOpen(true); }}
-                                    className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                                    className={`text-[10px] font-black uppercase tracking-widest transition-colors hover:text-zinc-500 ${contentColor}`}
                                 >
-                                    Login
+                                    Signin
                                 </button>
                             )}
-                            <div className="w-[1px] h-4 bg-zinc-100 dark:bg-zinc-800" />
+                            <div className={`w-[1px] h-4 transition-colors ${isScrolled ? 'bg-zinc-100 dark:bg-zinc-800' : 'bg-white/20'}`} />
                             <ThemeToggle />
                         </div>
 
                         <button
                             onClick={() => setIsSearchOpen(true)}
-                            className="p-2 text-zinc-900 dark:text-zinc-100 transition-transform active:scale-90"
+                            className={`p-2 transition-transform active:scale-90 ${contentColor}`}
                         >
                             <Search size={22} strokeWidth={1.5} />
                         </button>
                     </div>
                 </div>
             </header>
-
-            {/* Spacer to give content room */}
-            <div className="h-16 md:h-20"></div>
 
             {/* Sidebar / Premium Menu Overlay */}
             <AnimatePresence>
@@ -173,21 +188,24 @@ export default function Header() {
                             {/* Header inside Sidebar */}
                             <div className="p-8 md:p-12 flex items-center justify-between">
                                 <div className="flex flex-col">
-                                    <span className="font-outfit font-black text-2xl tracking-tighter text-zinc-900 dark:text-white uppercase">Mazlis.</span>
+                                    <Link href="/" className="font-outfit font-black text-2xl tracking-tighter text-zinc-900 dark:text-white uppercase">Mazlis.</Link>
                                     <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 tracking-[0.3em] uppercase mt-1">Intelligence Agency</span>
                                 </div>
-                                <button
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="p-4 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all active:scale-90"
-                                >
-                                    <X size={20} className="text-zinc-900 dark:text-zinc-100" />
-                                </button>
+                                <div className="flex items-center gap-4">
+                                    <ThemeToggle />
+                                    <button
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="p-4 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-all active:scale-90"
+                                    >
+                                        <X size={20} className="text-zinc-900 dark:text-zinc-100" />
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Main Navigation */}
                             <div className="flex-1 overflow-y-auto px-8 md:px-12 py-4 flex flex-col">
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-300 dark:text-zinc-700 mb-6">Directory</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-300 dark:text-zinc-700 mb-6">Navigation</span>
                                     <nav className="flex flex-col gap-2">
                                         {navLinks.map((link, idx) => (
                                             <motion.div
@@ -216,7 +234,7 @@ export default function Header() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="flex flex-col gap-2">
                                             <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-600">Global Office</span>
-                                            <p className="text-xs font-bold text-zinc-900 dark:text-zinc-300">København, Denmark</p>
+                                            <p className="text-xs font-bold text-zinc-900 dark:text-zinc-300">Darbhanga, Bihar</p>
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-600">Local Time</span>
@@ -231,7 +249,7 @@ export default function Header() {
                                 <div className="flex flex-col gap-6">
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-900 dark:text-white">Unrestricted Access</span>
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-900 dark:text-white">Join Mazlis</span>
                                             <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500">Subscribe for deep-dive investigations.</span>
                                         </div>
                                         <button className="p-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-full hover:scale-105 transition-transform active:scale-95">
@@ -244,16 +262,26 @@ export default function Header() {
                                             onClick={() => { setIsMenuOpen(false); setAuthTab('signin'); setIsAuthOpen(true); }}
                                             className="w-full py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white text-xs font-black uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800 transition-colors"
                                         >
-                                            Agent Login
+                                            Sign In
                                         </button>
                                     ) : (
                                         <div className="flex items-center justify-between py-4 px-6 rounded-2xl bg-white dark:bg-zinc-800 shadow-sm">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold">
-                                                    {user?.fullName[0]}
+                                            <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 group">
+                                                <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-700 overflow-hidden flex items-center justify-center text-[10px] font-bold group-hover:bg-zinc-900 dark:group-hover:bg-white dark:group-hover:text-zinc-900 transition-all relative">
+                                                    {user?.avatar ? (
+                                                        <Image
+                                                            src={getImageUrl(user.avatar)}
+                                                            alt="Avatar"
+                                                            fill
+                                                            className="object-cover"
+                                                            unoptimized={true}
+                                                        />
+                                                    ) : (
+                                                        user?.fullName[0]
+                                                    )}
                                                 </div>
                                                 <span className="text-xs font-bold dark:text-white underline underline-offset-4">{user?.fullName.split(' ')[0]}</span>
-                                            </div>
+                                            </Link>
                                             <button onClick={handleLogout} className="text-zinc-400 hover:text-red-500 transition-colors">
                                                 <LogOut size={16} />
                                             </button>
@@ -330,6 +358,49 @@ export default function Header() {
                 onOpenChange={setIsAuthOpen}
                 defaultTab={authTab}
             />
+
+            {/* Logout Confirmation Dialog */}
+            <AnimatePresence>
+                {isLogoutConfirmOpen && (
+                    <div className="fixed inset-0 z-[300] flex items-center justify-center px-6">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsLogoutConfirmOpen(false)}
+                            className="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-[2.5rem] p-10 flex flex-col items-center text-center shadow-2xl border border-zinc-200 dark:border-zinc-800"
+                        >
+                            <div className="w-16 h-16 rounded-3xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 mb-8 items-center">
+                                <LogOut size={28} />
+                            </div>
+                            <h2 className="text-2xl font-bold font-outfit mb-3">Terminate Session?</h2>
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-10 leading-relaxed font-medium">
+                                You are about to sign out of Mazlis. You'll need to re-authenticate to access your Intel library.
+                            </p>
+                            <div className="flex flex-col w-full gap-3">
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full py-4 bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95"
+                                >
+                                    Confirm Logout
+                                </button>
+                                <button
+                                    onClick={() => setIsLogoutConfirmOpen(false)}
+                                    className="w-full py-4 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95"
+                                >
+                                    Stay Logged In
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </>
     );
 }
