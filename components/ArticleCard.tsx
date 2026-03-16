@@ -6,6 +6,7 @@ import { getImageUrl } from '@/lib/config';
 interface ArticleCardProps {
     article: {
         id: string;
+        slug: string;
         title: string;
         author: string;
         date: string;
@@ -19,14 +20,14 @@ interface ArticleCardProps {
 export default function ArticleCard({ article, variant = 'horizontal' }: ArticleCardProps) {
     if (variant === 'vertical') {
         return (
-            <Link href={`/articles/${article.id}`} className="flex flex-col gap-4 group">
+            <Link href={`/articles/${article.slug}-${article.id}`} className="flex flex-col gap-4 group">
                 <div className="relative aspect-[4/3] w-full rounded-[1.5rem] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
                     <Image
                         src={getImageUrl(article.imageUrl)}
                         alt={article.title}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        unoptimized={true}
+                        unoptimized
                     />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -44,14 +45,14 @@ export default function ArticleCard({ article, variant = 'horizontal' }: Article
     }
 
     return (
-        <Link href={`/articles/${article.id}`} className="flex gap-4 items-center group py-4">
+        <Link href={`/articles/${article.slug}-${article.id}`} className="flex gap-4 items-center group py-4">
             <div className="relative w-24 h-24 shrink-0 rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900">
                 <Image
                     src={getImageUrl(article.imageUrl)}
                     alt={article.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    unoptimized={true}
+                    unoptimized
                 />
             </div>
             <div className="flex flex-col gap-1.5 flex-1">

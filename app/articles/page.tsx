@@ -71,6 +71,7 @@ export default function ArticlesPage() {
                                     key={article._id}
                                     article={{
                                         id: article._id,
+                                        slug: article.slug,
                                         title: article.title,
                                         author: article.author?.fullName || 'Anonymous',
                                         date: format(new Date(article.createdAt), 'MMM dd, yyyy'),

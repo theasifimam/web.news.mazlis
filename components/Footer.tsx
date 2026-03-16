@@ -20,21 +20,21 @@ export default function Footer() {
                 <div className="flex flex-col sm:flex-row gap-16 sm:gap-24 lg:gap-32">
                     <div className="flex flex-col gap-6">
                         <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-400 dark:text-zinc-500">Directory</h4>
-                        <nav className="flex flex-col gap-4 text-sm font-medium">
-                            <Link href="/about" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">About Us</Link>
-                            <Link href="/contact" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Contact</Link>
-                            <Link href="#" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Help & FAQ</Link>
-                        </nav>
-                    </div>
-
-                    <div className="flex flex-col gap-6">
-                        <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-400 dark:text-zinc-500">Legal Policies</h4>
-                        <nav className="flex flex-col gap-4 text-sm font-medium">
-                            <Link href="#" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Privacy Policy</Link>
-                            <Link href="#" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Terms of Service</Link>
-                            <Link href="#" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Cookie Usage</Link>
-                        </nav>
-                    </div>
+                        <nav className="flex flex-col gap-4 text-sm font-medium transition-all">
+                             <Link href="/about" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">About Us</Link>
+                             <Link href="/contact" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Contact</Link>
+                             <Link href="/legal/faq" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Help & FAQ</Link>
+                         </nav>
+                     </div>
+ 
+                     <div className="flex flex-col gap-6 font-sans">
+                         <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-400 dark:text-zinc-500">Legal Policies</h4>
+                         <nav className="flex flex-col gap-4 text-sm font-medium transition-all">
+                             <Link href="/legal/privacy-policy" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Privacy Policy</Link>
+                             <Link href="/legal/terms-conditions" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Terms of Service</Link>
+                             <Link href="/legal/cookie-usage" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">Cookie Usage</Link>
+                         </nav>
+                     </div>
                 </div>
 
             </div>

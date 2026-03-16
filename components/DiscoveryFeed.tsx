@@ -78,7 +78,7 @@ export default function DiscoveryFeed() {
             </h1>
             <div className="flex items-center">
               <Link
-                href={`/articles/${featured._id}`}
+                href={`/articles/${featured.slug}-${featured._id}`}
                 className="text-white text-sm font-bold flex items-center gap-2 group/btn"
               >
                 Learn More

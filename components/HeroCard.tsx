@@ -9,6 +9,7 @@ import { ArrowRight } from 'lucide-react';
 interface HeroCardProps {
     article: {
         id: string;
+        slug: string;
         title: string;
         category: string;
         imageUrl: string;
@@ -49,7 +50,7 @@ export default function HeroCard({ article }: HeroCardProps) {
                 >
                     {article.title}
                 </motion.h1>
-                <Link href={`/articles/${article.id}`} className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors group/link">
+                <Link href={`/articles/${article.slug}-${article.id}`} className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors group/link">
                     <span className="text-sm font-bold uppercase tracking-widest">Learn More</span>
                     <ArrowRight size={18} className="transition-transform group-hover/link:translate-x-1" />
                 </Link>

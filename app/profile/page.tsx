@@ -70,13 +70,13 @@ export default function ProfilePage() {
                                     className="relative w-20 h-20 md:w-24 md:h-24 rounded-[2rem] overflow-hidden border-4 border-white/20 shadow-2xl"
                                 >
                                     <Image
-                                        src={user.avatar
+                                        src={user?.avatar
                                             ? getImageUrl(user.avatar)
-                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=18181b&color=ffffff&size=256`}
-                                        alt={user.fullName}
+                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullName || 'User')}&background=18181b&color=ffffff&size=256`}
+                                        alt={user?.fullName || 'Profile avatar'}
                                         fill
                                         className="object-cover"
-                                        unoptimized={true}
+                                        unoptimized
                                     />
                                 </motion.div>
 
@@ -208,10 +208,11 @@ export default function ProfilePage() {
                                                 articlesRes.data.map((item) => (
                                                     <ArticleCard key={item._id} article={{
                                                         id: item._id,
+                                                        slug: item.slug,
                                                         title: item.title,
                                                         author: item.author.fullName,
                                                         date: new Date(item.createdAt).toLocaleDateString(),
-                                                        imageUrl: getImageUrl(item.image),
+                                                        imageUrl: item.image,
                                                         views: item.readCount
                                                     }} variant="vertical" />
                                                 ))
@@ -229,10 +230,11 @@ export default function ProfilePage() {
                                                 user.bookmarks.map((item: any) => (
                                                     <ArticleCard key={item._id} article={{
                                                         id: item._id,
+                                                        slug: item.slug,
                                                         title: item.title,
                                                         author: item.author?.fullName || 'Unknown',
                                                         date: new Date(item.createdAt).toLocaleDateString(),
-                                                        imageUrl: getImageUrl(item.image),
+                                                        imageUrl: item.image,
                                                         views: item.readCount
                                                     }} variant="vertical" />
                                                 ))
@@ -249,10 +251,11 @@ export default function ProfilePage() {
                                                 draftsRes.data.map((item) => (
                                                     <ArticleCard key={item._id} article={{
                                                         id: item._id,
+                                                        slug: item.slug,
                                                         title: item.title,
                                                         author: item.author.fullName,
                                                         date: new Date(item.createdAt).toLocaleDateString(),
-                                                        imageUrl: getImageUrl(item.image),
+                                                        imageUrl: item.image,
                                                         views: item.readCount
                                                     }} variant="vertical" />
                                                 ))

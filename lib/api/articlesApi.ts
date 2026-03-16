@@ -4,11 +4,13 @@ import { axiosBaseQuery } from "./axiosBaseQuery";
 export interface Article {
     _id: string;
     title: string;
+    slug: string;
     content: string;
     image: string;
     author: {
         _id: string;
         fullName: string;
+        username: string;
         avatar?: string;
     };
     topic: Array<{
@@ -39,7 +41,14 @@ export const articlesApi = createApi({
             }),
             providesTags: (result, error, id) => [{ type: "Articles", id }],
         }),
+        getArticleBySlug: builder.query<{ success: boolean; data: Article }, string>({
+            query: (slug) => ({
+                url: `/articles/slug/${slug}`,
+                method: "GET",
+            }),
+            providesTags: (result, error, slug) => [{ type: "Articles", id: slug }],
+        }),
     }),
 });
 
-export const { useGetArticlesQuery, useGetArticleByIdQuery } = articlesApi;
+export const { useGetArticlesQuery, useGetArticleByIdQuery, useGetArticleBySlugQuery } = articlesApi;

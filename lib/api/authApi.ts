@@ -121,6 +121,13 @@ export const authApi = createApi({
             providesTags: ["Auth"],
         }),
 
+        getPublicProfile: builder.query<{ success: boolean; data: { user: User } }, string>({
+            query: (username) => ({
+                url: `/users/public/${username}`,
+                method: "GET",
+            }),
+        }),
+
         updateProfile: builder.mutation<
             { success: boolean; message: string; data: { user: User } },
             FormData | (Partial<User> & { mNumber?: string; bio?: string; location?: string; socials?: any; settings?: any })
@@ -144,5 +151,6 @@ export const {
     useSignoutMutation,
     useUpdatePasswordMutation,
     useGetProfileQuery,
+    useGetPublicProfileQuery,
     useUpdateProfileMutation,
 } = authApi;

@@ -9,6 +9,7 @@ import { getImageUrl } from '@/lib/config';
 
 interface Article {
     id: string;
+    slug: string;
     title: string;
     category: string;
     imageUrl: string;
@@ -55,7 +56,6 @@ export default function HeroSlider({ articles }: HeroSliderProps) {
                         fill
                         className="object-cover"
                         priority
-                        unoptimized={true}
                     />
                 </motion.div>
             </AnimatePresence>
@@ -87,7 +87,7 @@ export default function HeroSlider({ articles }: HeroSliderProps) {
 
                         <div className="flex items-center gap-6 mt-2">
                             <Link
-                                href={`/articles/${article.id}`}
+                                href={`/articles/${article.slug}-${article.id}`}
                                 className="group flex items-center gap-4 py-1"
                             >
                                 <span className="text-sm font-black text-white uppercase tracking-widest">

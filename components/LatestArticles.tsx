@@ -39,7 +39,7 @@ export default function LatestArticles() {
                                 </span>
                             </div>
 
-                            <Link href={`/articles/${leadArticle._id}`} className="group">
+                            <Link href={`/articles/${leadArticle.slug}-${leadArticle._id}`} className="group">
                                 <h1 className="text-4xl md:text-[5.5rem] xl:text-[6.5rem] font-black font-outfit tracking-tighter text-zinc-900 dark:text-zinc-100 leading-[0.9] group-hover:text-zinc-600 dark:hover:text-zinc-400 dark:text-zinc-400 transition-colors uppercase">
                                     {leadArticle.title.split(' ').map((word, i) => (
                                         <React.Fragment key={i}>
@@ -70,7 +70,7 @@ export default function LatestArticles() {
                                 </span>
                             </div>
                             <div className="w-[1px] h-8 bg-zinc-200 dark:bg-zinc-800 hidden sm:block"></div>
-                            <Link href={`/articles/${leadArticle._id}`} className="hidden sm:flex items-center gap-2 group ml-auto">
+                            <Link href={`/articles/${leadArticle.slug}-${leadArticle._id}`} className="hidden sm:flex items-center gap-2 group ml-auto">
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-500 transition-colors">Read Report</span>
                                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                             </Link>
@@ -78,7 +78,7 @@ export default function LatestArticles() {
                     </div>
 
                     <div className="lg:col-span-5 order-1 lg:order-2">
-                        <Link href={`/articles/${leadArticle._id}`} className="block relative group overflow-hidden bg-zinc-100 dark:bg-zinc-900 aspect-[4/5] md:aspect-[3/4] rounded-2xl md:rounded-4xl">
+                        <Link href={`/articles/${leadArticle.slug}-${leadArticle._id}`} className="block relative group overflow-hidden bg-zinc-100 dark:bg-zinc-900 aspect-[4/5] md:aspect-[3/4] rounded-2xl md:rounded-4xl">
                             <img
                                 src={getImageUrl(leadArticle.image)}
                                 alt={leadArticle.title}
@@ -105,7 +105,7 @@ export default function LatestArticles() {
                     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10 lg:gap-14">
                         {secondaryArticles.map((item, idx) => (
                             <article key={item._id} className="group flex flex-col gap-3">
-                                <Link href={`/articles/${item._id}`} className="block relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-900 rounded-3xl mb-1 shadow-sm">
+                                <Link href={`/articles/${item.slug}-${item._id}`} className="block relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-900 rounded-3xl mb-1 shadow-sm">
                                     <img
                                         src={getImageUrl(item.image)}
                                         alt={item.title}
@@ -114,7 +114,7 @@ export default function LatestArticles() {
                                 </Link>
 
                                 <div className="flex flex-col gap-1.5 px-0.5">
-                                    <Link href={`/articles/${item._id}`} className="group-hover:text-zinc-500 transition-colors">
+                                    <Link href={`/articles/${item.slug}-${item._id}`} className="group-hover:text-zinc-500 transition-colors">
                                         <h3 className="text-[13px] md:text-2xl font-bold font-outfit tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.2] line-clamp-2">
                                             {item.title}
                                         </h3>
